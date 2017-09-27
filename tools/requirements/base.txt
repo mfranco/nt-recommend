@@ -1,0 +1,4 @@
+matplotlib
+PrettyTable
+nltk
+-e git+https://github.com/Riffstation/flaskutils.git@dev#egg=flaskutils
