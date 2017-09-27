@@ -65,7 +65,7 @@ python3 manage.py initial_diagnose
 #### General Statistics
 
 | Total Users | Total Movies | Total Tags | Matrix Density |
- ------------- -------------- ------------ ---------------- 
+|-------------|--------------|------------|----------------|
 | 671         | 9125         |    1296    | 0.0163         |
 
 
@@ -73,7 +73,7 @@ python3 manage.py initial_diagnose
 ### Statistics by User and Ratings
 
 | Max Number of Ratings for User | Min Number of Ratings for User | Median Ratings for User | Mean Ratings for User | Standard Deviation Ratings for User |
- -------------------------------- -------------------------------- ------------------------- ----------------------- ------------------------------------- 
+|--------------------------------|--------------------------------|-------------------------|-----------------------|-------------------------------------|
 |              2391              |               20               |            71           |          149          |                 231                 |
 
 
@@ -81,7 +81,7 @@ python3 manage.py initial_diagnose
 ### Statistics by Movie and Ratings:
 
 | Max Number of Ratings for Movie | Min Number of Ratings for Movie | Median Ratings for Movie | Mean Ratings for Movie | Standard Deviation Ratings for Movie |
- --------------------------------- --------------------------------- -------------------------- ------------------------ -------------------------------------- 
+|---------------------------------|---------------------------------|--------------------------|------------------------|--------------------------------------|
 |               341               |                0                |            3             |           11           |                  24                  |
 
 
@@ -89,14 +89,14 @@ python3 manage.py initial_diagnose
 ### Total number of ratings for each of the ratings
 
 | 0.5  | 1.0  | 1.5  | 2.0  | 2.5  |  3.0  |  3.5  |  4.0  | 4.5  |  5.0  |
- ------ ------ ------ ------ ------ ------- ------- ------- ------ ------- 
+|------|------|------|------|------|-------|-------|-------|------|-------|
 | 1101 | 3326 | 1687 | 7271 | 4449 | 20064 | 10538 | 28750 | 7723 | 15095 |
 
 
 ### Statistics by Tags and User
 
 | Max Number of Tags by User | Min Number of Tags by User | Median Number of Tags by User | Mean Number of Tags by User | Standard Deviation Tags by User |
- ---------------------------- ---------------------------- ------------------------------- ----------------------------- --------------------------------- 
+|----------------------------|----------------------------|-------------------------------|-----------------------------|---------------------------------|
 |            401             |             0              |               0               |             1.93            |               18.6              |
 
 
@@ -104,7 +104,7 @@ python3 manage.py initial_diagnose
 ### Statistics by Tags and Movie
 
 | Max Number of Tags by Movie | Min Number of Tags by Movie | Median Number of Tags by Movie | Mean Number of Tags by Movie | Standard Deviation Tags by Movie |
- ----------------------------- ----------------------------- -------------------------------- ------------------------------ ---------------------------------- 
+|-----------------------------|-----------------------------|--------------------------------|------------------------------|----------------------------------|
 |              25             |              0              |               0                |            0.142             |              0.763               |
 
 
