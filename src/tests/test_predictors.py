@@ -1,5 +1,5 @@
 from app.models import DB
-from flaskutils.test import FlaskTestCase
+from flask_philo.test import FlaskTestCase
 from app.predictors.mean_predictor import MeanPredictor
 from app.predictors.collaborative import (
     CollaborativePredictor, ResnickPredictor)

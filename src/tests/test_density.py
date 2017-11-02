@@ -1,5 +1,5 @@
 from app.models import DB
-from flaskutils.test import FlaskTestCase
+from flask_philo.test import FlaskTestCase
 
 import os
 

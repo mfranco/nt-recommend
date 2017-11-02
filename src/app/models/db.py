@@ -1,4 +1,4 @@
-from flaskutils import app
+from flask_philo import app
 from app.models import Rating, Movie, User, Tag
 from app.nlp.utils import tokenize
 

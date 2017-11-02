@@ -12,7 +12,7 @@ this project is not suitable for production environments.
 
 ## Installation
 
-We recommend to install this framework insised a python virtual environment. If you don't
+We recommend to install this framework inside a python virtual environment. If you don't
 have [virtualenv](https://pypi.python.org/pypi/virtualenv) in your machine, you can install
 it with the following command:
 
@@ -59,7 +59,7 @@ of this dataset that contains 100,000 ratings and 1,300 tag applications applied
 The following command generates basic stats about the dataset:
 
 ```
-python3 manage.py initial_diagnose
+python manage.py initial_diagnose
 ```
 
 #### General Statistics

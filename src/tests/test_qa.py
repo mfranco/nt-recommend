@@ -1,4 +1,4 @@
-from flaskutils.test import FlaskTestCase
+from flask_philo.test import FlaskTestCase
 from app.qa.util import mean_squared_error, root_mean_squared_error
 import math
 

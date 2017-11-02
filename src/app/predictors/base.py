@@ -1,5 +1,5 @@
 from datetime import datetime
-from flaskutils import app
+from flask_philo import app
 from app.qa.util import root_mean_squared_error
 
 import statistics

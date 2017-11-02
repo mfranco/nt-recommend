@@ -8,7 +8,7 @@ sys.path.append(os.path.join(BASE_DIR, './'))
 
 def main():
     print(BASE_DIR)
-    from flaskutils import init_app, execute_command
+    from flask_philo import init_app, execute_command
     description = 'Manage flask MIR application'
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('command', help='command to execute')
@@ -27,9 +27,8 @@ def main():
             default='config.development')
 
     args, extra_params = parser.parse_known_args()
-    os.environ.setdefault('FLASKUTILS_SETTINGS_MODULE', args.settings)
+    os.environ.setdefault('FLASK_PHILO_SETTINGS_MODULE', args.settings)
     init_app(__name__, BASE_DIR)
-    print("execute_command : ", args.command)
     execute_command(args.command)
 
 
