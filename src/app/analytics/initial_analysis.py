@@ -1,5 +1,48 @@
+from flask_philo import app
 from app.models import DB
 from prettytable import PrettyTable
+import matplotlib.pyplot as plt
+import os
+
+
+def plot_ratings_distribution(db):
+    """
+    Plots an histogram of the distribution
+    of ratings in the dataset
+    """
+    img_name = os.path.join(
+        app.config['DATA_DIR'], 'img', 'ratings_distribution.png')
+
+    x = [r.rating for r in db.ratings]
+
+    n, bins, patches = plt.hist(
+        x, 10, normed=0, facecolor='green', alpha=0.75)
+    plt.grid(True)
+    plt.xlabel('Ratings')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+    plt.savefig(img_name, dpi=300)
+
+
+def plot_user_ratings_distribution(db):
+    """
+    Plots an histogram of the distribution
+    of number of ratings by user in the dataset
+    """
+    img_name = os.path.join(
+        app.config['DATA_DIR'], 'img', 'user_ratings_distribution.png')
+
+    x = [len(u.ratings) for u in db.users.values()]
+
+    n, bins, patches = plt.hist(
+        x, 300, normed=0, facecolor='green', alpha=0.75, log=True)
+    plt.ylim([10, 1000])
+    plt.xlim([0, 150])
+    plt.xlabel('Number of Users')
+    plt.ylabel('Ratings Frequency')
+    plt.tight_layout()
+    plt.grid(True)
+    plt.savefig(img_name, dpi=300)
 
 
 def compute():
@@ -39,6 +82,9 @@ def compute():
         '{0:.3g}'.format(db.stats['users']['sd'])
     ])
     print(t)
+
+    plot_ratings_distribution(db)
+    plot_user_ratings_distribution(db)
 
     print('\nStatistics by Movie and Ratings:')
 
