@@ -1,4 +1,5 @@
 from .base import BasePredictor
+from app.models import Prediction
 from .similarity import cosine, euclidean, msd, pearson
 
 
@@ -47,13 +48,11 @@ class CollaborativePredictor(BasePredictor):
             below.append(weighted_score)
 
         if sum(below) == 0:
-            return 0
+            return Prediction(user_id, item_id, 0)
 
         else:
-            predicted_rating = sum(above) / sum(below)
-            if predicted_rating > 0:
-                self.predicted_coverage_set.add((user_id, item_id,))
-            return predicted_rating
+            predicted = sum(above) / sum(below)
+            return Prediction(user_id, item_id, predicted)
 
     def get_user_neighbourhood(self, user_id, size=10):
         """
@@ -162,10 +161,8 @@ class ResnickPredictor(CollaborativePredictor):
             below.append(abs(sim))
 
         if sum(below) == 0:
-            return 0
+            return Prediction(user_id, item_id, 0)
 
         else:
-            predicted_rating = sum(above) / sum(below)
-            if predicted_rating > 0:
-                self.predicted_coverage_set.add((user_id, item_id,))
-            return predicted_rating
+            predicted = sum(above) / sum(below)
+            return Prediction(user_id, item_id, predicted)

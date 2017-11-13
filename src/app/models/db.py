@@ -8,7 +8,7 @@ import statistics
 
 
 class DB(object):
-    def __init__(self, db_dir=None):
+    def __init__(self, db_dir=None, ratings_to_exlude=None):
         """
         Encapsulates all information related to reatings, movies and user
         in one single class easy to access
@@ -18,6 +18,12 @@ class DB(object):
                 app.config['DATA_DIR'], 'db', 'ml-latest-small')
         else:
             self.db_dir = db_dir
+
+        if ratings_to_exlude is None:
+            self.ratings_to_exlude = []
+        else:
+            self.ratings_to_exlude = ratings_to_exlude
+
         self.load_tags()
         self.load_ratings()
         self.load_movies()
@@ -44,13 +50,19 @@ class DB(object):
 
     def load_ratings(self):
         """
-        Loads in memory ratings database
+        Loads in memory ratings database.
+        It ignores ratings described in ratings_to_exlude
         """
         fname = os.path.join(self.db_dir, 'ratings.csv')
+        rt_list = []
         with open(fname) as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             next(reader, None)
-            self.ratings = tuple(Rating(*row) for row in reader)
+            for row in reader:
+                rt = Rating(*row)
+                if (rt.user_id, rt.movie_id,) not in self.ratings_to_exlude:
+                    rt_list.append(rt)
+        self.ratings = tuple(rt_list)
 
     def load_movies(self):
         """
