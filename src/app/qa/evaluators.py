@@ -130,6 +130,7 @@ class KFold(object):
         jump_size = math.ceil(len(self.db.ratings) / n_splits)
 
         while index < len(self.db.ratings):
+            app.logger.info('building fold numer {}'.format(index + 1))
             idx = 0
             rt_to_exclude = []
             test_set = []
