@@ -7,8 +7,8 @@ recommendation techniques. **It is not compatible with python2.**
 ## Disclaimer
 
 This framework is only for educational proposes, we use basic native python data structures,
-we have implmented all the algorithms by ourselves with the only aim of learning, therefore,
-this project is not suitable for production environments.
+we have implemented all the algorithms by ourselves with the only aim of learning, therefore,
+this project is **not suitable for production environments**.
 
 ## Installation
 
@@ -56,7 +56,7 @@ of this dataset that contains 100,000 ratings and 1,300 tag applications applied
 
 ### Initial Data analysis
 
-The following command generates basic stats about the dataset:
+The following command generates basic statistics about the dataset:
 
 ```
 python manage.py initial_diagnose
@@ -111,13 +111,124 @@ python manage.py initial_diagnose
 
 
 
-## Executing unit test:
+## Executing Unit Test:
 
 
 ```
 cd src
 workon nt-recommend
 python manage.py test
+```
+
+
+## Running the Experiments
+
+### Benchmarking Mean Predictor
+
+
+```python3 manage.py mean_predictor``` command benchmarks the performance of mean predictor.
+The following parameters can be used to customize the execution:
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --t ratings threshold: default value is 2, it specifies the minimum number of ratings by
+movie required to include that movie in the computations.
+
+
+The following command run a K-Fold, leave-one-out experiment for mean predictor with default parameters:
+
+
+```
+cd src
+workon nt-recommend
+python manage.py mean_predictor
+```
+
+
+The previous command is computational expensive. A more realistic approach is to run a 10-Fold validation experiment:
+
+```
+cd src
+workon nt-recommend
+python manage.py mean_predictor --kn 10 --t 1
+```
+
+### Benchmarking Collaborative Filtering
+
+```python3 manage.py collaborative_filter``` command benchmarks performance of collaborative filtering.
+The following paramters can be used to mofify predictor behaviour:
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+* --t ratings threshold: default value is 2, it specifies the minimum number of ratings by
+movie required to include that movie in the computations.
+
+The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
+a neighbourhood size of 10:
+
+
+```
+python manage.py collaborative_filter --n 1 --m cosine --ns 10 --kn 10 
+```
+
+The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
+a neighbourhood size of 10:
+
+
+```
+python manage.py collaborative_filter --n 1 --m msd --ns 10 --kn 10 
+```
+
+
+The following command executes 10-fold validation for collaborative filtering with euclidean distance similarity metric and
+a neighbourhood size of 10:
+
+```
+python manage.py collaborative_filter --n 1 --m euclidean --ns 10 --kn 10
+```
+
+The following command executes 10-fold validation for collaborative filtering with similarity based
+in Pearson Correlation and
+a neighbourhood size of 10:
+```
+python manage.py collaborative_filter --n 1 --m pearson --ns 10 --kn 10
+```
+
+The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
+a neighbourhood size of 100:
+
+
+```
+python manage.py collaborative_filter --n 1 --m msd --ns 100 --kn 10 
+```
+
+
+### Benchmarking Resnik Collaborative Filtering
+
+```python3 manage.py resnik_collaborative_filter``` command benchmarks performance of collaborative filtering with
+reskink formula.
+
+The following parameters can be used to mofify predictor behaviour:
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+* --t ratings threshold: default value is 2, it specifies the minimum number of ratings by
+movie required to include that movie in the computations.
+
+The following command executes 10-fold validation for resnik collaborative filtering with msd similarity metric and
+a neighbourhood size of 10:
+
+
+```
+python manage.py resnik_collaborative_filter --n 1 --m msd --ns 10 --kn 10 
 ```
 
 

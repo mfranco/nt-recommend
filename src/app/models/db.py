@@ -99,7 +99,8 @@ class DB(object):
                 self.users[rating.user_id] = user
 
         for tag in self.tags:
-            self.users[tag.user_id].append_tag(tag)
+            if tag.user_id in self.users:
+                self.users[tag.user_id].append_tag(tag)
 
     def compute_density(self):
         """

@@ -119,8 +119,7 @@ class TestCollaborativePredictor(FlaskTestCase):
         """
         predictor_params = {'neighbourhood_size': 2}
         evaluator = PredictorEvaluator(
-            self.dir_name, CollaborativePredictor,
-            predictor_params=predictor_params)
+            self.dir_name, CollaborativePredictor, predictor_params=predictor_params)
         evaluator.run()
 
     def test_resnick_predictor(self):

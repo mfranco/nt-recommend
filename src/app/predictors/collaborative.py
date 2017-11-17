@@ -34,6 +34,7 @@ class CollaborativePredictor(BasePredictor):
         """
         neighbourhood = self.get_user_neighbourhood(
             user_id=user_id, size=self.neighbourhood_size)
+        print(len(neighbourhood))
         above = []
         below = []
 
@@ -81,8 +82,11 @@ class CollaborativePredictor(BasePredictor):
         Compute similarity between two user based in their common
         movies and reviews
         """
-        assert user_id_1 in self.db.users
-        assert user_id_2 in self.db.users
+        if user_id_1 not in self.db.users:
+            return 0
+
+        if user_id_2 not in self.db.users:
+            return 0
 
         # if similarity has been already computed
         if (user_id_1, user_id_2,) in self.similarities:

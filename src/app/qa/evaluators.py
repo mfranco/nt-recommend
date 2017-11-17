@@ -117,7 +117,6 @@ class KFold(object):
         If n_splits is None, it will generate
         Total Number of Ratings folds (Leave-One-Out) Style
         """
-
         self.db_dir = db_dir
         self.db = DB(db_dir=self.db_dir)
         if n_splits is None:
@@ -125,6 +124,7 @@ class KFold(object):
         self._split(n_splits)
 
     def _split(self, n_splits):
+        app.logger.info('Creating K-fold {} splits'.format(n_splits))
         index = 0
         split_db_list = []
         jump_size = math.ceil(len(self.db.ratings) / n_splits)
@@ -162,6 +162,7 @@ class PredictorEvaluator(object):
         """
         Evaluates Prediction performance
         """
+        self.initial_time = datetime.utcnow()
         n_splits = kwargs.get('n_splits')
         if 'predictor_params' in kwargs:
             predictor_params = kwargs['predictor_params']
@@ -211,7 +212,7 @@ class PredictorEvaluator(object):
         Runs Predictors expiriments KFold Validation
 
         """
-        initial_time = datetime.utcnow()
+
 
         app.logger.info('Running KFold Validation ')
         self.evaluator_predictions = []
@@ -243,6 +244,6 @@ class PredictorEvaluator(object):
         self.compute_metrics()
 
         self.total_execution_time = (
-            (datetime.utcnow() - initial_time).total_seconds()) / 60
+            (datetime.utcnow() - self.initial_time).total_seconds()) / 60
         app.logger.info(
-            'LILO finished in %s seconds', self.total_execution_time)
+            'Execution finished in %s minutes', self.total_execution_time)
