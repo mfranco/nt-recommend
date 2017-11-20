@@ -111,7 +111,7 @@ class BaseEvaluator(object):
 
 
 class KFold(object):
-    def __init__(self, db_dir, n_splits=None, **kwargs):
+    def __init__(self, db_dir, n_splits=None, initialize_db=False, **kwargs):
         """
         Divides all samples in k groups of samples.
         If n_splits is None, it will generate
@@ -121,9 +121,10 @@ class KFold(object):
         self.db = DB(db_dir=self.db_dir)
         if n_splits is None:
             n_splits = len(self.db.ratings)
-        self._split(n_splits)
+        self._split(n_splits, initialize_db=initialize_db)
+        self.total_ratings = len(self.db.ratings)
 
-    def _split(self, n_splits):
+    def _split(self, n_splits, initialize_db=False):
         app.logger.info('Creating K-fold {} splits'.format(n_splits))
         index = 0
         split_db_list = []
@@ -147,7 +148,8 @@ class KFold(object):
                         idx += 1
                         jump_index += 1
                     db = DB(
-                        db_dir=self.db_dir, ratings_to_exlude=rt_to_exclude)
+                        db_dir=self.db_dir, ratings_to_exlude=rt_to_exclude,
+                        initialize=initialize_db)
                     split_db_list.append(
                         {'train_set': db, 'test_set': test_set})
                 else:
@@ -213,8 +215,6 @@ class PredictorEvaluator(object):
         Runs Predictors expiriments KFold Validation
 
         """
-
-
         app.logger.info('Running KFold Validation ')
         self.evaluator_predictions = []
 
@@ -225,6 +225,10 @@ class PredictorEvaluator(object):
 
         for predictor in self.predictors:
             prd = predictor['predictor']
+            # saving memory implementing lazy initialization
+            if not prd.db.is_initialized:
+                prd.db.initialize()
+
             iteration_predictions = []
             for test_pred in predictor['test_set']:
                 real_rating = test_pred.rating
@@ -241,6 +245,8 @@ class PredictorEvaluator(object):
                 'predictions': iteration_predictions,
                 'test_set_size': len(predictor['test_set'])
             })
+            # releasing memory from fold db copy
+            del predictor
 
         self.compute_metrics()
 

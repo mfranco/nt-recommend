@@ -8,7 +8,8 @@ import statistics
 
 
 class DB(object):
-    def __init__(self, db_dir=None, ratings_to_exlude=None):
+    def __init__(
+            self, db_dir=None, ratings_to_exlude=None, initialize=True):
         """
         Encapsulates all information related to reatings, movies and user
         in one single class easy to access
@@ -24,6 +25,13 @@ class DB(object):
         else:
             self.ratings_to_exlude = ratings_to_exlude
 
+        self.is_initialized = False
+        if initialize:
+            self.initialize()
+
+
+    def initialize(self):
+        self.is_initialized = True
         self.load_tags()
         self.load_ratings()
         self.load_movies()

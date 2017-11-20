@@ -34,7 +34,7 @@ class CollaborativePredictor(BasePredictor):
         """
         neighbourhood = self.get_user_neighbourhood(
             user_id=user_id, size=self.neighbourhood_size)
-        print(len(neighbourhood))
+
         above = []
         below = []
 

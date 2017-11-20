@@ -19,3 +19,10 @@ HOST = '0.0.0.0'
 USERNAME = 'user'
 
 PASSWORD = 'pass'
+
+
+LOGGER = {
+    'file': True,
+    'filename': '~/recommend.log',
+    'console': False
+}

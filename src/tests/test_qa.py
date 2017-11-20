@@ -49,13 +49,33 @@ class TestKFold(FlaskTestCase):
         self.db = DB(db_dir=self.db_dir)
 
     def test_leave_one_out(self):
-        folds = KFold(self.db_dir, n_splits=len(self.db.ratings))
-        assert len(self.db.ratings) == len(folds.splits)
+        """
+        A leave-one-out takes a dataset of size n and create
+        a list of n-folds.
+        Every fold is a list of n-1 observations
+        Every fold has a list of test data of size 1
+        """
+        folds = KFold(
+            self.db_dir, n_splits=len(self.db.ratings), initialize_db=True)
+        # original dataset contains 28 ratings
+        assert 28 == folds.total_ratings
+        # leave-one-out will generate 28 folds
+        assert 28 == len(folds.splits)
+        # every split will have (len(self.db.ratings)) - 1 ratings in
+        # the train set and 1 in the test set
         for sp in folds.splits:
-            assert len(sp['train_set'].ratings) == (len(self.db.ratings) - 1)
+            assert len(sp['train_set'].ratings) == (folds.total_ratings - 1)
+            assert 1 == len(sp['test_set'])
 
     def test_10_fold(self):
-        folds = KFold(self.db_dir, n_splits=10)
+        """
+        10 Fold will create 10 folds.
+        Each fold will have size of n - math.ceil(n/10) observations.
+        Every fold will have a test data list of size math.ceil(n/10)
+        """
+        folds = KFold(self.db_dir, n_splits=10, initialize_db=True)
         assert 10 == len(folds.splits)
         assert (len(folds.splits[0]['train_set'].ratings)) == (
             len(self.db.ratings) - math.ceil(len(self.db.ratings) / 10))
+        assert (len(folds.splits[0]['test_set'])) == (
+            math.ceil(len(self.db.ratings) / 10))

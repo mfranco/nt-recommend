@@ -48,6 +48,7 @@ class TestSimpleMeanPredictor(FlaskTestCase):
         coverage1 = evaluator.coverage
 
         # performance should be worst this time
+        evaluator = PredictorEvaluator(dir_name, MeanPredictor)
         predictor_params = {'threshold': 100000}
         evaluator.run(predictor_params=predictor_params)
         assert 0 == evaluator.coverage
