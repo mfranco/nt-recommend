@@ -41,16 +41,16 @@ class TestSimpleMeanPredictor(FlaskTestCase):
         """
         dir_name = os.path.join(BASE_DIR, 'data', 'simple_coverage')
         evaluator = PredictorEvaluator(dir_name, MeanPredictor)
-        predictor_params = {'threshold': 1}
-        evaluator.run(predictor_params=predictor_params)
+        prediction_params = {'threshold': 1}
+        evaluator.run(predictor_params=prediction_params)
         assert 0.4 == evaluator.coverage
         rmse1 = evaluator.rmse
         coverage1 = evaluator.coverage
 
         # performance should be worst this time
         evaluator = PredictorEvaluator(dir_name, MeanPredictor)
-        predictor_params = {'threshold': 100000}
-        evaluator.run(predictor_params=predictor_params)
+        prediction_params = {'threshold': 100000}
+        evaluator.run(prediction_params=prediction_params)
         assert 0 == evaluator.coverage
         assert rmse1 > evaluator.coverage
         assert coverage1 > evaluator.coverage
@@ -120,7 +120,8 @@ class TestCollaborativePredictor(FlaskTestCase):
         """
         predictor_params = {'neighbourhood_size': 2}
         evaluator = PredictorEvaluator(
-            self.dir_name, CollaborativePredictor, predictor_params=predictor_params)
+            self.dir_name, CollaborativePredictor,
+            predictor_params=predictor_params)
         evaluator.run()
 
     def test_resnick_predictor(self):

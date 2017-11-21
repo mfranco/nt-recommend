@@ -1,7 +1,7 @@
 from app.models import DB
 from flask_philo.test import FlaskTestCase
 from app.qa.util import mean_squared_error, root_mean_squared_error
-from app.qa.evaluators import KFold
+from app.qa.evaluators import KFoldGenerator
 
 import math
 import os
@@ -55,16 +55,19 @@ class TestKFold(FlaskTestCase):
         Every fold is a list of n-1 observations
         Every fold has a list of test data of size 1
         """
-        folds = KFold(
+        k_fold_generator = KFoldGenerator(
             self.db_dir, n_splits=len(self.db.ratings), initialize_db=True)
         # original dataset contains 28 ratings
-        assert 28 == folds.total_ratings
+        assert 28 == k_fold_generator.total_ratings
         # leave-one-out will generate 28 folds
-        assert 28 == len(folds.splits)
+        splits = [sp for sp in k_fold_generator.get_folds()]
+
+        assert 28 == len(splits)
         # every split will have (len(self.db.ratings)) - 1 ratings in
         # the train set and 1 in the test set
-        for sp in folds.splits:
-            assert len(sp['train_set'].ratings) == (folds.total_ratings - 1)
+        for sp in splits:
+            assert len(sp['train_set'].ratings) == (
+                k_fold_generator.total_ratings - 1)
             assert 1 == len(sp['test_set'])
 
     def test_10_fold(self):
@@ -73,9 +76,11 @@ class TestKFold(FlaskTestCase):
         Each fold will have size of n - math.ceil(n/10) observations.
         Every fold will have a test data list of size math.ceil(n/10)
         """
-        folds = KFold(self.db_dir, n_splits=10, initialize_db=True)
-        assert 10 == len(folds.splits)
-        assert (len(folds.splits[0]['train_set'].ratings)) == (
+        k_fold_generator = KFoldGenerator(
+            self.db_dir, n_splits=10, initialize_db=True)
+        splits = [sp for sp in k_fold_generator.get_folds()]
+        assert 10 == len(splits)
+        assert (len(splits[0]['train_set'].ratings)) == (
             len(self.db.ratings) - math.ceil(len(self.db.ratings) / 10))
-        assert (len(folds.splits[0]['test_set'])) == (
+        assert (len(splits[0]['test_set'])) == (
             math.ceil(len(self.db.ratings) / 10))

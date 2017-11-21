@@ -29,7 +29,6 @@ class DB(object):
         if initialize:
             self.initialize()
 
-
     def initialize(self):
         self.is_initialized = True
         self.load_tags()

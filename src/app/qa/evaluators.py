@@ -110,7 +110,7 @@ class BaseEvaluator(object):
         return intersection
 
 
-class KFold(object):
+class KFoldGenerator(object):
     def __init__(self, db_dir, n_splits=None, initialize_db=False, **kwargs):
         """
         Divides all samples in k groups of samples.
@@ -119,26 +119,31 @@ class KFold(object):
         """
         self.db_dir = db_dir
         self.db = DB(db_dir=self.db_dir)
-        if n_splits is None:
-            n_splits = len(self.db.ratings)
-        self._split(n_splits, initialize_db=initialize_db)
         self.total_ratings = len(self.db.ratings)
+        if n_splits is None:
+            self._n_splits = len(self.db.ratings)
+        else:
+            self._n_splits = n_splits
 
-    def _split(self, n_splits, initialize_db=False):
-        app.logger.info('Creating K-fold {} splits'.format(n_splits))
-        index = 0
-        split_db_list = []
-        jump_size = math.ceil(len(self.db.ratings) / n_splits)
+        # self._split(n_splits, initialize_db=initialize_db)
 
-        while index < len(self.db.ratings):
-            app.logger.info('building fold numer {}'.format(index + 1))
+        self._index = 0
+        self._jump_size = math.ceil(len(self.db.ratings) / self._n_splits)
+        self._initialize_db = initialize_db
+
+    def get_folds(self):
+        app.logger.info('Generating K-fold {} splits'.format(self._n_splits))
+
+        while self._index < len(self.db.ratings):
+            app.logger.info('generating fold numer {}'.format(self._index + 1))
+
             idx = 0
             rt_to_exclude = []
             test_set = []
             while idx < len(self.db.ratings):
-                if idx == index:
+                if idx == self._index:
                     jump_index = 0
-                    while jump_index < jump_size:
+                    while jump_index < self._jump_size:
                         if idx == len(self.db.ratings):
                             break
 
@@ -149,15 +154,11 @@ class KFold(object):
                         jump_index += 1
                     db = DB(
                         db_dir=self.db_dir, ratings_to_exlude=rt_to_exclude,
-                        initialize=initialize_db)
-                    split_db_list.append(
-                        {'train_set': db, 'test_set': test_set})
+                        initialize=self._initialize_db)
+                    yield {'train_set': db, 'test_set': test_set}
                 else:
                     idx += 1
-            index += jump_size
-
-        # make test set and split immutable objects
-        self.splits = tuple(split_db_list)
+            self._index += self._jump_size
 
 
 class PredictorEvaluator(object):
@@ -167,21 +168,16 @@ class PredictorEvaluator(object):
         """
         self.initial_time = datetime.utcnow()
         n_splits = kwargs.get('n_splits')
-        if 'predictor_params' in kwargs:
-            predictor_params = kwargs['predictor_params']
-        else:
-            predictor_params = {}
 
-        self.folds = KFold(db_dir, n_splits=n_splits)
-        self.n_splits = len(self.folds.splits)
-        self.predictors = tuple([
-            {
-                'test_set': split['test_set'],
-                'predictor': predictor_class(
-                    split['train_set'], **predictor_params)
-            }
-            for split in self.folds.splits
-        ])
+        if 'init_predictor_params' in kwargs:
+            self._init_predictor_params = kwargs['predictor_params']
+        else:
+            self._init_predictor_params = {}
+
+        self._k_fold_generator = KFoldGenerator(
+            db_dir, n_splits=n_splits, initialize_db=False)
+
+        self._predictor_class = predictor_class
 
     def compute_metrics(self):
         """
@@ -218,35 +214,43 @@ class PredictorEvaluator(object):
         app.logger.info('Running KFold Validation ')
         self.evaluator_predictions = []
 
-        if 'predictor_params' in kwargs:
-            predictor_params = kwargs['predictor_params']
+        if 'prediction_params' in kwargs:
+            prediction_params = kwargs['prediction_params']
         else:
-            predictor_params = {}
+            prediction_params = {}
 
-        for predictor in self.predictors:
-            prd = predictor['predictor']
-            # saving memory implementing lazy initialization
-            if not prd.db.is_initialized:
-                prd.db.initialize()
+        split_index = 1
+        for split in self._k_fold_generator.get_folds():
+            app.logger.info('running fold number {}'.format(split_index))
+            split_index += 1
+            test_set = split['test_set']
+            predictor = self._predictor_class(
+                split['train_set'], **self._init_predictor_params)
+
+            # saving memory by implementing lazy initialization
+            if not predictor.db.is_initialized:
+                predictor.db.initialize()
 
             iteration_predictions = []
-            for test_pred in predictor['test_set']:
+
+            for test_pred in test_set:
                 real_rating = test_pred.rating
 
-                prediction = prd.predict(
+                prediction = predictor.predict(
                     user_id=test_pred.user_id, item_id=test_pred.movie_id,
-                    **predictor_params
+                    **prediction_params
                 )
 
                 iteration_predictions.append(
                     PredictionResult(prediction, real_rating)
                 )
+
             self.evaluator_predictions.append({
                 'predictions': iteration_predictions,
-                'test_set_size': len(predictor['test_set'])
+                'test_set_size': len(test_set)
             })
-            # releasing memory from fold db copy
-            del predictor
+
+            del split
 
         self.compute_metrics()
 
