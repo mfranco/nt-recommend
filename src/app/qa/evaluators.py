@@ -170,7 +170,7 @@ class PredictorEvaluator(object):
         n_splits = kwargs.get('n_splits')
 
         if 'init_predictor_params' in kwargs:
-            self._init_predictor_params = kwargs['predictor_params']
+            self._init_predictor_params = kwargs['init_predictor_params']
         else:
             self._init_predictor_params = {}
 
