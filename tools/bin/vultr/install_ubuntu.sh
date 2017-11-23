@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo adduser ubuntu
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install python3-setuptools python3-matplotlib -y
