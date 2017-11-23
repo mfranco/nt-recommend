@@ -1,9 +1,7 @@
 from .base import BasePredictor
 from app.models import Prediction
-from .similarity import cosine, euclidean, msd, pearson
+from app.classifiers import KNN
 
-
-import operator
 import statistics
 
 
@@ -12,28 +10,24 @@ class CollaborativePredictor(BasePredictor):
             self, db, threshold=1, similarity_metric='msd',
             neighbourhood_size=100):
         self.threshold = threshold
-        sim_dict = {
-            'cosine': cosine, 'euclidean': euclidean,
-            'msd': msd, 'pearson': pearson}
-        self.sim_func = sim_dict[similarity_metric]
-        self.neighbourhood_size = neighbourhood_size
-        # store neighbourhood by user
-        self.neighbourhoods = {}
-        self.similarities = {}
+        self.knn = KNN(
+            db,
+            neighbourhood_size=neighbourhood_size,
+            similarity_metric=similarity_metric)
         super(CollaborativePredictor, self).__init__(db)
 
     def normalize(self, user_id_1, user_id_2):
         """
         """
-        return 1 - (self.get_user_similarity(
+        return 1 - (self.knn.get_user_similarity(
             user_id_1, user_id_2) / self.db.max_diff_ratings)
 
     def predict(self, user_id,  item_id):
         """
         Based on different  metrics
         """
-        neighbourhood = self.get_user_neighbourhood(
-            user_id=user_id, size=self.neighbourhood_size)
+        neighbourhood = self.knn.get_user_neighbourhood(
+            user_id=user_id)
 
         above = []
         below = []
@@ -54,59 +48,6 @@ class CollaborativePredictor(BasePredictor):
         else:
             predicted = sum(above) / sum(below)
             return Prediction(user_id, item_id, predicted)
-
-    def get_user_neighbourhood(self, user_id, size=10):
-        """
-        Generates user neighbourhood, if neighbourhood have been
-        generated previously, it won't be generated again
-        """
-        if user_id in self.neighbourhoods:
-            return self.neighbourhoods[user_id]
-
-        if size > (len(self.db.users.keys()) - 1):
-            size = len(self.db.users.keys()) - 1
-        similarity_by_user = {}
-
-        for other_user_id in (k for k in self.db.users.keys() if k != user_id):
-            similarity_by_user[other_user_id] = self.get_user_similarity(
-                user_id_1=user_id, user_id_2=other_user_id)
-
-        sorted_n = sorted(
-            similarity_by_user.items(), key=operator.itemgetter(1))
-        neighbourhood = [(user[0], user[1]) for user in sorted_n][0: size]
-        self.neighbourhoods[user_id] = neighbourhood
-        return neighbourhood
-
-    def get_user_similarity(self, user_id_1, user_id_2):
-        """
-        Compute similarity between two user based in their common
-        movies and reviews
-        """
-        if user_id_1 not in self.db.users:
-            return 0
-
-        if user_id_2 not in self.db.users:
-            return 0
-
-        # if similarity has been already computed
-        if (user_id_1, user_id_2,) in self.similarities:
-            return self.similarities[(user_id_1, user_id_2,)]
-
-        user_1_reviews = set(self.db.users[user_id_1].ratings.keys())
-        user_2_reviews = set(self.db.users[user_id_2].ratings.keys())
-
-        x, y = [], []
-        for movie_id in user_1_reviews.intersection(user_2_reviews):
-            x.append(self.db.users[user_id_1].ratings[movie_id].rating)
-            y.append(self.db.users[user_id_2].ratings[movie_id].rating)
-
-        if len(x) > 0:
-            val = self.sim_func(x, y)
-
-        else:
-            val = 0
-        self.similarities[(user_id_1, user_id_2,)] = val
-        return val
 
 
 class ResnickPredictor(CollaborativePredictor):
@@ -144,8 +85,8 @@ class ResnickPredictor(CollaborativePredictor):
     def predict(self, user_id,  item_id):
         above = []
         below = []
-        neighbourhood = self.get_user_neighbourhood(
-            user_id=user_id, size=self.neighbourhood_size)
+        neighbourhood = self.knn.get_user_neighbourhood(
+            user_id=user_id)
 
         for u in neighbourhood:
             if item_id not in self.db.users[u[0]].ratings:
@@ -158,7 +99,7 @@ class ResnickPredictor(CollaborativePredictor):
             rating_uj = self.db.users[u[0]].ratings[item_id].rating
 
             # sim between uj and user_id
-            sim = self.get_user_similarity(
+            sim = self.knn.get_user_similarity(
                 user_id_1=user_id, user_id_2=u[0])
 
             above.append((rating_uj - ruj) * sim)

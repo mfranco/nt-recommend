@@ -2,7 +2,6 @@ from app.models import DB
 from app.predictors.mean_predictor import MeanPredictor
 from app.predictors.collaborative import (
     CollaborativePredictor, ResnickPredictor)
-from app.predictors.similarity import cosine, euclidean, msd, pearson
 from app.qa.evaluators import PredictorEvaluator
 from flask_philo.test import FlaskTestCase
 import os
@@ -56,30 +55,6 @@ class TestSimpleMeanPredictor(FlaskTestCase):
         assert coverage1 > evaluator.coverage
 
 
-class TestDistance(FlaskTestCase):
-    def test_cosine(self):
-        x = [3, 5, 8, 17]
-        y = [6, 2, 7, 9]
-        assert round(0.9240, 4) == round(cosine(x, y), 4)
-
-    def test_euclidean(self):
-        x = [3, 5, 8, 17]
-        y = [6, 2, 7, 9]
-        assert round(9.110434, 4) == round(euclidean(x, y), 4)
-
-    def test_msd(self):
-        x = [3, 4, 3, 2]
-        y = [1, 2, 3, 5]
-        assert round(17/4, 2) == round(msd(x, y), 2)
-
-    def test_pearson(self):
-        x = [1, 2, 1, 1, 2, 3, 1]
-        y1 = [2, 1, 2, 2, 1, 2, 2]
-        y2 = [2, 4, 2, 2, 4, 6, 2]
-        assert -0.372 == round(pearson(x, y1), 3)
-        assert 1 == pearson(x, y2)
-
-
 class TestCollaborativePredictor(FlaskTestCase):
     def setup(self):
         self.dir_name = os.path.join(BASE_DIR, 'data', 'predictors')
@@ -93,20 +68,20 @@ class TestCollaborativePredictor(FlaskTestCase):
         """
         # computing similarity bwetween users
         assert 17/4 == round(
-            self.predictor.get_user_similarity(
+            self.predictor.knn.get_user_similarity(
                 user_id_1='1', user_id_2='2'), 2)
 
     def test_similarity_neighbourhoods(self):
         """
         Computing similarity neighbourhoods
         """
-        neighbourhood = self.predictor.get_user_neighbourhood(
-            user_id='2', size=4)
+        neighbourhood = self.predictor.knn.get_user_neighbourhood(
+            user_id='2')
         assert '5' == neighbourhood[0][0]
         assert '4' == neighbourhood[-1][0]
 
-        predictor = CollaborativePredictor(self.db, neighbourhood_size=100)
-        neighbourhood = predictor.get_user_neighbourhood(user_id='2', size=2)
+        predictor = CollaborativePredictor(self.db, neighbourhood_size=2)
+        neighbourhood = predictor.knn.get_user_neighbourhood(user_id='2')
         assert '5' == neighbourhood[0][0]
         assert '3' == neighbourhood[-1][0]
 

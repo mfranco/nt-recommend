@@ -40,12 +40,14 @@ def run(**kwargs):
         threshold=args.t)
 
     t = PrettyTable([
-       'Number of K-folds', 'Threshold', 'Coverage', 'RMSE',
-       'Total Execution Time (Minutes)'
+        'Predictor',
+        'Number of K-folds', 'Threshold', 'Coverage', 'RMSE',
+        'Total Execution Time (Minutes)'
 
     ])
 
     t.add_row([
+        'Collaborative Filtering',
         args.kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
         '{0:.3g}'.format(runner.evaluator.rmse),
         runner.total_execution_time
@@ -54,7 +56,7 @@ def run(**kwargs):
 
     fname = os.path.join(
         app.config['DATA_DIR'], 'results', '{}.txt'.format(
-        str(uuid.uuid4()).split('-')[0]))
+            str(uuid.uuid4()).split('-')[0]))
 
     with open(fname, 'w') as f:
         f.write(str(t))

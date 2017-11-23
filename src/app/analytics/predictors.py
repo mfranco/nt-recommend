@@ -26,6 +26,7 @@ class MeanPredictoRunner(object):
         self.evaluator.run(prediction_params=prediction_params)
         self.total_execution_time = self.evaluator.total_execution_time
 
+
 class CollaborativePredictoRunner(object):
     """
     Runs benchmark for Collaborative Filtering
