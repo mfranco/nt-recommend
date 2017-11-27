@@ -228,7 +228,7 @@ a neighbourhood size of 10:
 
 
 ```
-python manage.py resnik_collaborative_filter --n 1 --m msd --ns 10 --kn 10 
+python manage.py resnik_collaborative_filter  --m msd --ns 10 --kn 10 
 ```
 
 

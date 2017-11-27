@@ -27,9 +27,14 @@ def run(**kwargs):
 
     ])
 
+    if args.kn is None:
+        kn = 'Leave One Out'
+    else:
+        kn = args.kn
+
     t.add_row([
         'Mean Predictor',
-        args.kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
+        kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
         '{0:.3g}'.format(runner.evaluator.rmse),
         runner.total_execution_time
     ])

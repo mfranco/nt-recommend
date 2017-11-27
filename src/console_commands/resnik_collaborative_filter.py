@@ -40,14 +40,21 @@ def run(**kwargs):
         threshold=args.t, predictor_class='resnik')
 
     t = PrettyTable([
-       'Predictor', 'Number of K-folds', 'Threshold', 'Coverage',
+       'Predictor', 'Similarity Metric', 'Neighbourhood Size',
+       'Number of K-folds', 'Threshold', 'Coverage',
        'RMSE', 'Total Execution Time (Minutes)'
 
     ])
 
+
+    if args.kn is None:
+        kn = 'Leave One Out'
+    else:
+        kn = args.kn
+
     t.add_row([
-        'Resnik Collaborative',
-        args.kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
+        'Resnik Collaborative', args.m, args.ns,
+        kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
         '{0:.3g}'.format(runner.evaluator.rmse),
         runner.total_execution_time
     ])

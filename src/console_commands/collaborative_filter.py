@@ -39,16 +39,22 @@ def run(**kwargs):
         kn=args.kn, similarity_metric=args.m, neighbourhood_size=args.ns,
         threshold=args.t)
 
+    if args.kn is None:
+        kn = 'Leave One Out'
+    else:
+        kn = args.kn
+
+
     t = PrettyTable([
-        'Predictor',
+        'Predictor', 'Similarity Metric', 'Neighbourhood Size',
         'Number of K-folds', 'Threshold', 'Coverage', 'RMSE',
         'Total Execution Time (Minutes)'
 
     ])
 
     t.add_row([
-        'Collaborative Filtering',
-        args.kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
+        'Collaborative Filtering', args.m, args.ns,
+        kn, args.t, '{0:.3g}'.format(runner.evaluator.coverage),
         '{0:.3g}'.format(runner.evaluator.rmse),
         runner.total_execution_time
     ])

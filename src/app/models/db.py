@@ -9,7 +9,7 @@ import statistics
 
 class DB(object):
     def __init__(
-            self, db_dir=None, ratings_to_exlude=None, initialize=True):
+            self, db_dir=None, initialize=True):
         """
         Encapsulates all information related to reatings, movies and user
         in one single class easy to access
@@ -19,11 +19,6 @@ class DB(object):
                 app.config['DATA_DIR'], 'db', 'ml-latest-small')
         else:
             self.db_dir = db_dir
-
-        if ratings_to_exlude is None:
-            self.ratings_to_exlude = []
-        else:
-            self.ratings_to_exlude = ratings_to_exlude
 
         self.is_initialized = False
         if initialize:
@@ -44,6 +39,30 @@ class DB(object):
             unique_ratings.add(record.rating)
         self.max_diff_ratings = (
             min(unique_ratings) - max(unique_ratings)) ** 2
+
+    def clone(self, ratings_to_exlude):
+        """
+        Clone a dataset excluding ratings, it doesn't read the whole dataset
+        """
+        if not self.is_initialized:
+            self.initialize()
+        db = DB(db_dir='clone', initialize=False)
+        db.is_initialized = True
+        db.tags = self.tags
+        db.movies = self.movies
+        db.ratings = tuple([
+            rt for rt in self.ratings
+            if (rt.user_id, rt.movie_id,) not in ratings_to_exlude
+        ])
+        db.users = self.users
+        db.compute_density()
+        db.compute_stats()
+        unique_ratings = set()
+        for record in db.ratings:
+            unique_ratings.add(record.rating)
+        db.max_diff_ratings = (
+            min(unique_ratings) - max(unique_ratings)) ** 2
+        return db
 
     def load_tags(self):
         """
@@ -67,8 +86,7 @@ class DB(object):
             next(reader, None)
             for row in reader:
                 rt = Rating(*row)
-                if (rt.user_id, rt.movie_id,) not in self.ratings_to_exlude:
-                    rt_list.append(rt)
+                rt_list.append(rt)
         self.ratings = tuple(rt_list)
 
     def load_movies(self):
