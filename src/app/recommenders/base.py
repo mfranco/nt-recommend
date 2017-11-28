@@ -98,9 +98,9 @@ class FrequentItemRecommender(BaseRecommender):
 
 
 
-def LinkedItemRecommender(BaseRecommender):
+class LinkedItemRecommender(BaseRecommender):
     pass
 
 
-def PredictorRecommender(BaseRecommender):
+class PredictorRecommender(BaseRecommender):
     pass
