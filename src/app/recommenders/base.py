@@ -1,3 +1,4 @@
+from app.classifiers import KNN
 from app.predictors.collaborative import (
     CollaborativePredictor, ResnickPredictor)
 
@@ -20,7 +21,7 @@ class BaseRecommender(object):
     """
 
     def __init__(
-            self, db, predictor='collaborative',
+            self, db, predictor='collaborative', similarity_metric='msd',
             neighbourhood_size=10, **kwargs):
 
         predictor_ditc = {
@@ -38,13 +39,68 @@ class BaseRecommender(object):
 
         self._predictor = predictor_ditc[predictor](**init_predictor_params)
 
-    def rank_recommendations(self):
+        self.build_neighbourhood(neighbourhood_size, similarity_metric)
+        self.user_recommendations = {}
+
+    def build_neighbourhood(self, neighbourhood_size, similarity_metric):
+        """
+        Uses KNN to build a neighbourhood of users
+        """
+        self.knn = KNN(
+            self.db,
+            neighbourhood_size=neighbourhood_size,
+            similarity_metric=similarity_metric)
+
+    def rank_recommendations(self, recommendations):
         """
         Ranks recommendation based in some criteria
         """
         raise NotImplementedError
 
-    def get_user_recommendations(self, user_id):
+    def get_user_recommendations(self, user_id, size=10):
         """
         Returns a list of recommendations for a given user.
         """
+        # return if recommendation list has been already generated
+
+        if user_id in self.user_recommendations:
+            return self.user_recommendations[user_id]
+
+        if user_id not in self.db.users:
+            return tuple([])
+
+        user_ratings = self.db.users[user_id].ratings.keys()
+        recommendations = set()
+
+        for user in self.knn.get_user_neighbourhood(user_id=user_id):
+            for rating in user.ratings:
+                if rating.movie_id not in user_ratings:
+                    recommendations.add(rating.movie_id)
+
+        ranked_list = self.rank_recommendations(recommendations)
+
+        index = 0
+        final_recommendations = []
+        while (index < size) and index < len(final_recommendations):
+            movie_id = ranked_list[index]
+            index += 1
+            final_recommendations.append(self.db.movies[movie_id])
+
+        self.user_recommendations[user_id] =  tuple(final_recommendations)
+        return self.user_recommendations[user_id]
+
+
+class FrequentItemRecommender(BaseRecommender):
+    def rank_recommendations(self, recommendations):
+        """
+        Ranks a list of item based on the rating frequency by item
+        """
+
+
+
+def LinkedItemRecommender(BaseRecommender):
+    pass
+
+
+def PredictorRecommender(BaseRecommender):
+    pass
