@@ -8,12 +8,17 @@ import statistics
 class CollaborativePredictor(BasePredictor):
     def __init__(
             self, db, threshold=1, similarity_metric='msd',
-            neighbourhood_size=100):
+            neighbourhood_size=100, knn=None):
         self.threshold = threshold
-        self.knn = KNN(
-            db,
-            neighbourhood_size=neighbourhood_size,
-            similarity_metric=similarity_metric)
+
+        if knn is None:
+            self.knn = KNN(
+                db,
+                neighbourhood_size=neighbourhood_size,
+                similarity_metric=similarity_metric)
+        else:
+            self.knn = knn
+
         super(CollaborativePredictor, self).__init__(db)
 
     def normalize(self, user_id_1, user_id_2):

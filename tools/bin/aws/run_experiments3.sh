@@ -17,8 +17,15 @@ cd ~/src/nt-recommend/src
 #python3 manage.py resnik_collaborative_filter  --m pearson --ns 100 --kn 1000
 #sleep 10
 
-python3 manage.py resnik_collaborative_filter  --m msd --ns 1000 --kn 10000
+#python3 manage.py resnik_collaborative_filter  --m msd --ns 1000 --kn 10000
+#sleep 10
+#
+#python3 manage.py resnik_collaborative_filter  --m pearson --ns 1000 --kn 10000
+#sleep 10
+
+
+python3 manage.py resnik_collaborative_filter  --m pearson --ns 10 --kn 20000
 sleep 10
 
-python3 manage.py resnik_collaborative_filter  --m pearson --ns 1000 --kn 10000
+python3 manage.py resnik_collaborative_filter  --m pearson --ns 10 --kn 20000
 sleep 10
