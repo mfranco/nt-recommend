@@ -2,6 +2,8 @@ from app.classifiers import KNN
 from app.predictors.collaborative import (
     CollaborativePredictor, ResnickPredictor)
 
+import operator
+
 
 class BaseRecommender(object):
     """
@@ -72,19 +74,24 @@ class BaseRecommender(object):
         user_ratings = self.db.users[user_id].ratings.keys()
         recommendations = set()
 
-        for user in self.knn.get_user_neighbourhood(user_id=user_id):
-            for rating in user.ratings:
-                if rating.movie_id not in user_ratings:
-                    recommendations.add(rating.movie_id)
+        for uid in self.knn.get_user_neighbourhood(user_id=user_id):
+            user = self.db.users[uid[0]]
 
+            for movie_id in user.ratings.keys():
+                if movie_id not in user_ratings:
+                    recommendations.add(movie_id)
         ranked_list = self.rank_recommendations(recommendations)
 
         index = 0
         final_recommendations = []
-        while (index < size) and index < len(final_recommendations):
-            movie_id = ranked_list[index]
-            index += 1
-            final_recommendations.append(self.db.movies[movie_id])
+
+        while index < size:
+            if index < len(ranked_list):
+                movie_id = ranked_list[index][0]
+                index += 1
+                final_recommendations.append(self.db.movies[movie_id])
+            else:
+                break
 
         self.user_recommendations[user_id] =  tuple(final_recommendations)
         return self.user_recommendations[user_id]
@@ -95,8 +102,10 @@ class FrequentItemRecommender(BaseRecommender):
         """
         Ranks a list of item based on the rating frequency by item
         """
-
-
+        movie_dict = {}
+        for movie_id in recommendations:
+            movie_dict[movie_id] = len(self.db.movies[movie_id].ratings.keys())
+        return sorted(movie_dict.items(), key=operator.itemgetter(1))
 
 class LinkedItemRecommender(BaseRecommender):
     pass
