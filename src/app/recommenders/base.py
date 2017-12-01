@@ -1,8 +1,9 @@
 from app.classifiers import KNN
 from app.predictors.collaborative import (
     CollaborativePredictor, ResnickPredictor)
-
+from app.predictors.mean_predictor import MeanPredictor
 import operator
+import statistics
 
 
 class BaseRecommender(object):
@@ -23,12 +24,13 @@ class BaseRecommender(object):
     """
 
     def __init__(
-            self, db, predictor='collaborative', similarity_metric='msd',
+            self, db, predictor='mean', similarity_metric='msd',
             neighbourhood_size=10, **kwargs):
 
         predictor_ditc = {
             'collaborative': CollaborativePredictor,
-            'resnik': ResnickPredictor
+            'resnik': ResnickPredictor,
+            'mean': MeanPredictor
         }
 
         if 'init_predictor_params' in kwargs:
@@ -37,11 +39,17 @@ class BaseRecommender(object):
             init_predictor_params = {}
 
         self.db = db
+        self.build_neighbourhood(neighbourhood_size, similarity_metric)
         init_predictor_params['db'] = self.db
 
-        self._predictor = predictor_ditc[predictor](**init_predictor_params)
+        # inject neighbourhood to predictor
+        if predictor in ('collaborative', 'resnik'):
+            init_predictor_params['knn'] = self.knn
+            init_predictor_params['similarity_metric'] = similarity_metric
+            init_predictor_params['neighbourhood_size'] = neighbourhood_size
 
-        self.build_neighbourhood(neighbourhood_size, similarity_metric)
+        self.predictor = predictor_ditc[predictor](**init_predictor_params)
+
         self.user_recommendations = {}
 
     def build_neighbourhood(self, neighbourhood_size, similarity_metric):
@@ -53,7 +61,7 @@ class BaseRecommender(object):
             neighbourhood_size=neighbourhood_size,
             similarity_metric=similarity_metric)
 
-    def rank_recommendations(self, recommendations):
+    def rank_recommendations(self, recommendations, user_id):
         """
         Ranks recommendation based in some criteria
         """
@@ -80,7 +88,7 @@ class BaseRecommender(object):
             for movie_id in user.ratings.keys():
                 if movie_id not in user_ratings:
                     recommendations.add(movie_id)
-        ranked_list = self.rank_recommendations(recommendations)
+        ranked_list = self.rank_recommendations(recommendations, user_id)
 
         index = 0
         final_recommendations = []
@@ -92,24 +100,43 @@ class BaseRecommender(object):
                 final_recommendations.append(self.db.movies[movie_id])
             else:
                 break
-
-        self.user_recommendations[user_id] =  tuple(final_recommendations)
+        self.user_recommendations[user_id] = tuple(final_recommendations)
         return self.user_recommendations[user_id]
 
 
 class FrequentItemRecommender(BaseRecommender):
-    def rank_recommendations(self, recommendations):
+    def rank_recommendations(self, recommendations, user_id):
         """
-        Ranks a list of item based on the rating frequency by item
+        Ranks a list of items based on the rating frequency by item
         """
         movie_dict = {}
         for movie_id in recommendations:
             movie_dict[movie_id] = len(self.db.movies[movie_id].ratings.keys())
         return sorted(movie_dict.items(), key=operator.itemgetter(1))
 
+
 class LinkedItemRecommender(BaseRecommender):
-    pass
+    def rank_recommendations(self, recommendations, user_id):
+        """
+        Ranks a list of items based Mean of the ratings across neighbours
+        """
+        movie_dict = {}
+        for movie_id in recommendations:
+            movie_dict[movie_id] = statistics.mean([
+                rt.rating for rt in
+                self.db.movies[movie_id].ratings.values()])
+        return sorted(movie_dict.items(), key=operator.itemgetter(1))
 
 
 class PredictorRecommender(BaseRecommender):
-    pass
+    def rank_recommendations(self, recommendations, user_id):
+        """
+        Ranks a list of items based on a prediction for each of the candidate
+        items
+        """
+        movie_dict = {}
+
+        for movie_id in recommendations:
+            movie_dict[movie_id] = self.predictor.predict(
+                user_id=user_id, item_id=movie_id).rating
+        return sorted(movie_dict.items(), key=operator.itemgetter(1))

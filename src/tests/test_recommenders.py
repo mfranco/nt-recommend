@@ -18,3 +18,23 @@ class TestRecommenders(FlaskTestCase):
         recommender = FrequentItemRecommender(self.db)
         rec_list = recommender.get_user_recommendations(user_id='1')
         assert 5 == len(rec_list)
+
+    def test_linked_item_recommender(self):
+        recommender = LinkedItemRecommender(self.db)
+        rec_list = recommender.get_user_recommendations(user_id='1')
+        assert 5 == len(rec_list)
+
+    def test_mean_predictor_recommender(self):
+        recommender = PredictorRecommender(self.db, predicor='mean')
+        rec_list = recommender.get_user_recommendations(user_id='1')
+        assert 5 == len(rec_list)
+
+    def test_collaborative_predictor_recommender(self):
+        recommender = PredictorRecommender(self.db, predicor='collaborative')
+        rec_list = recommender.get_user_recommendations(user_id='1')
+        assert 5 == len(rec_list)
+
+    def test_resnik_predictor_recommender(self):
+        recommender = PredictorRecommender(self.db, predicor='resnik')
+        rec_list = recommender.get_user_recommendations(user_id='1')
+        assert 5 == len(rec_list)

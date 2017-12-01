@@ -44,7 +44,6 @@ def run(**kwargs):
     else:
         kn = args.kn
 
-
     t = PrettyTable([
         'Predictor', 'Similarity Metric', 'Neighbourhood Size',
         'Number of K-folds', 'Threshold', 'Coverage', 'RMSE',

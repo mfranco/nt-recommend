@@ -153,9 +153,6 @@ class KFoldGenerator(object):
                         idx += 1
                         jump_index += 1
                     db = self.db.clone(rt_to_exclude)
-                    #db = DB(
-                    #    db_dir=self.db_dir, ratings_to_exlude=rt_to_exclude,
-                    #    initialize=self._initialize_db)
                     yield {'train_set': db, 'test_set': test_set}
                 else:
                     idx += 1
