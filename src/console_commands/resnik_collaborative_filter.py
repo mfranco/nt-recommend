@@ -60,7 +60,7 @@ def run(**kwargs):
     print(t)
 
     fname = os.path.join(
-        app.config['DATA_DIR'], 'results', '{}.txt'.format(
+        app.config['DATA_DIR'], 'results', 'resnik_cf_{}.txt'.format(
             str(uuid.uuid4()).split('-')[0]))
 
     with open(fname, 'w') as f:

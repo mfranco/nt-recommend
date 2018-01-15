@@ -50,11 +50,25 @@ class DB(object):
         db.is_initialized = True
         db.tags = self.tags
         db.movies = self.movies
+
         db.ratings = tuple([
             rt for rt in self.ratings
             if (rt.user_id, rt.movie_id,) not in ratings_to_exlude
         ])
+
         db.users = self.users
+
+        # excluding ratings from movies
+        for ext in ratings_to_exlude:
+            user_id = ext[0]
+            movie_id = ext[1]
+
+            if user_id in db.movies[movie_id].ratings:
+                del db.movies[movie_id].ratings[user_id]
+
+            if movie_id in db.users[user_id].ratings:
+                del db.users[user_id].ratings[movie_id]
+
         db.compute_density()
         db.compute_stats()
         unique_ratings = set()

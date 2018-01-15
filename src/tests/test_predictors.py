@@ -42,7 +42,7 @@ class TestSimpleMeanPredictor(FlaskTestCase):
         evaluator = PredictorEvaluator(dir_name, MeanPredictor)
         prediction_params = {'threshold': 1}
         evaluator.run(predictor_params=prediction_params)
-        assert 0.4 == evaluator.coverage
+        assert 0.2 == evaluator.coverage
         rmse1 = evaluator.rmse
         coverage1 = evaluator.coverage
 

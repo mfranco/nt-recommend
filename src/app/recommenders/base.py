@@ -41,7 +41,6 @@ class BaseRecommender(object):
         self.db = db
         self.build_neighbourhood(neighbourhood_size, similarity_metric)
         init_predictor_params['db'] = self.db
-
         # inject neighbourhood to predictor
         if predictor in ('collaborative', 'resnik'):
             init_predictor_params['knn'] = self.knn
@@ -81,18 +80,16 @@ class BaseRecommender(object):
 
         user_ratings = self.db.users[user_id].ratings.keys()
         recommendations = set()
-
-        for uid in self.knn.get_user_neighbourhood(user_id=user_id):
-            user = self.db.users[uid[0]]
-
-            for movie_id in user.ratings.keys():
+        for nid in self.knn.get_user_neighbourhood(user_id=user_id):
+            neigbour = self.db.users[nid[0]]
+            for movie_id in neigbour.ratings.keys():
                 if movie_id not in user_ratings:
                     recommendations.add(movie_id)
+
         ranked_list = self.rank_recommendations(recommendations, user_id)
 
         index = 0
         final_recommendations = []
-
         while index < size:
             if index < len(ranked_list):
                 movie_id = ranked_list[index][0]
@@ -101,6 +98,7 @@ class BaseRecommender(object):
             else:
                 break
         self.user_recommendations[user_id] = tuple(final_recommendations)
+
         return self.user_recommendations[user_id]
 
 
@@ -112,7 +110,9 @@ class FrequentItemRecommender(BaseRecommender):
         movie_dict = {}
         for movie_id in recommendations:
             movie_dict[movie_id] = len(self.db.movies[movie_id].ratings.keys())
-        return sorted(movie_dict.items(), key=operator.itemgetter(1))
+
+        return sorted(
+            movie_dict.items(), key=operator.itemgetter(1), reverse=True)
 
 
 class LinkedItemRecommender(BaseRecommender):
