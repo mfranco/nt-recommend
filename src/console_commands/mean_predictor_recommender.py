@@ -29,8 +29,8 @@ def run(**kwargs):
 
     t = PrettyTable([
         'Recommender',
-        'Number of K-folds', 'Neigbourhood size', 'Similarity', 'Precision', 'Recall', 'F1',
-        'Total Execution Time (Minutes)'
+        'Number of K-folds', 'Neigbourhood size', 'Similarity', 'Precision',
+        'Recall', 'F1', 'Total Execution Time (Minutes)'
 
     ])
 
@@ -49,7 +49,9 @@ def run(**kwargs):
     print(t)
 
     fname = os.path.join(
-        app.config['DATA_DIR'], 'results', 'MeanPredictorRecommender_{}.txt'.format(
+        app.config['DATA_DIR'],
+        'results',
+        'MeanPredictorRecommender_{}.txt'.format(
             str(uuid.uuid4()).split('-')[0]))
 
     with open(fname, 'w') as f:

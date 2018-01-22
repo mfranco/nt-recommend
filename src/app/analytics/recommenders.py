@@ -24,10 +24,9 @@ class FrequentItemRecommenderRunner(object):
         self.total_execution_time = self.evaluator.total_execution_time
 
 
-
 class LinkedItemRecommenderRunner(object):
     def __init__(
-            self, kn=None, neighbourhood_size=10, similarity_metric='msd' ):
+            self, kn=None, neighbourhood_size=10, similarity_metric='msd'):
         db_dir = os.path.join(
             app.config['DATA_DIR'], 'db', 'ml-latest-small')
 
@@ -41,7 +40,6 @@ class LinkedItemRecommenderRunner(object):
             init_recommender_params=init_recommender_params, n_splits=kn)
         self.evaluator.run()
         self.total_execution_time = self.evaluator.total_execution_time
-
 
 
 class MeanPredictorRecommenderRunner(object):

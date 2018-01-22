@@ -31,7 +31,8 @@ class TestRecommenders(FlaskTestCase):
         assert 5 == len(rec_list)
 
     def test_collaborative_predictor_recommender(self):
-        recommender = PredictorRecommender(self.db, predictor_name='collaborative')
+        recommender = PredictorRecommender(
+            self.db, predictor_name='collaborative')
         rec_list = recommender.get_user_recommendations(user_id='1')
         assert 5 == len(rec_list)
 

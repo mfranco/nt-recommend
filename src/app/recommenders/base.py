@@ -30,7 +30,6 @@ class BaseRecommender(object):
 
         self.user_recommendations = {}
 
-
     def build_neighbourhood(self, neighbourhood_size, similarity_metric):
         """
         Uses KNN to build a neighbourhood of users
@@ -96,7 +95,6 @@ class FrequentItemRecommender(BaseRecommender):
             movie_dict.items(), key=operator.itemgetter(1), reverse=True)
 
 
-
 class LinkedItemRecommender(BaseRecommender):
 
     def rank_recommendations(self, recommendations, user_id):
@@ -115,7 +113,6 @@ class PredictorRecommender(BaseRecommender):
     def __init__(
             self, db, predictor_name=None, similarity_metric='msd',
             neighbourhood_size=10, **kwargs):
-
 
         predictor_ditc = {
             'collaborative': CollaborativePredictor,
@@ -139,7 +136,8 @@ class PredictorRecommender(BaseRecommender):
             init_predictor_params['knn'] = self.knn
             init_predictor_params['similarity_metric'] = similarity_metric
             init_predictor_params['neighbourhood_size'] = neighbourhood_size
-        self.predictor = predictor_ditc[predictor_name](**init_predictor_params)
+        self.predictor = predictor_ditc[predictor_name](
+            **init_predictor_params)
 
         self.user_recommendations = {}
 
