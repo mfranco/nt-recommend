@@ -69,10 +69,10 @@ class ResnickPredictor(CollaborativePredictor):
     """
     def __init__(
         self, db, threshold=1, similarity_metric='msd',
-            neighbourhood_size=100):
+            neighbourhood_size=100, knn=None):
         super(ResnickPredictor, self).__init__(
             db, threshold=threshold, similarity_metric=similarity_metric,
-            neighbourhood_size=neighbourhood_size)
+            neighbourhood_size=neighbourhood_size, knn=knn)
 
         self.mean_ratigns_by_user = {}
 

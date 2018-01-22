@@ -17,8 +17,6 @@ class MeanPredictoRunner(object):
             app.config['DATA_DIR'], 'db', 'ml-latest-small')
         prediction_params = {'threshold': threshold}
         app.logger.info('Starting MeanPredictor Evaluator')
-        if kn is not None:
-            kn = int(kn)
         self.evaluator = PredictorEvaluator(
             dir_name, MeanPredictor, n_splits=kn)
         prediction_params = prediction_params

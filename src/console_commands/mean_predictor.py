@@ -13,7 +13,8 @@ def run(**kwargs):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--kn', help='Number of Folds', required=False, default=None)
+        '--kn', help='Number of Folds', required=False,
+        default=None, type=int)
     parser.add_argument(
         '--t', help='threshold ', required=False, default=2, type=int)
 
@@ -41,7 +42,7 @@ def run(**kwargs):
     print(t)
 
     fname = os.path.join(
-        app.config['DATA_DIR'], 'results', 'mp_{}.txt'.format(
+        app.config['DATA_DIR'], 'results', 'MeanPredictor_{}.txt'.format(
             str(uuid.uuid4()).split('-')[0]))
 
     with open(fname, 'w') as f:

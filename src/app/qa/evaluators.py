@@ -138,10 +138,6 @@ class RecommenderEvaluator(object):
         app.logger.info('Running Recommenders KFold Validation ')
         self.evaluator_predictions = []
 
-        prediction_params = {}
-        if 'prediction_params' in kwargs:
-            prediction_params = kwargs['prediction_params']  # noqa
-
         split_index = 1
 
         self.recommendations = {}

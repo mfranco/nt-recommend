@@ -167,16 +167,16 @@ The following paramters can be used to mofify predictor behaviour:
 * --t ratings threshold: default value is 2, it specifies the minimum number of ratings by
 movie required to include that movie in the computations.
 
-The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
-a neighbourhood size of 10:
+The following command executes 10-fold validation for collaborative filtering with msd
+similarity metric and a neighbourhood size of 10:
 
 
 ```
 python manage.py collaborative_filter --n 1 --m cosine --ns 10 --kn 10 
 ```
 
-The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
-a neighbourhood size of 10:
+The following command executes 10-fold validation for collaborative filtering with msd similarity
+metric and a neighbourhood size of 10:
 
 
 ```
@@ -184,23 +184,22 @@ python manage.py collaborative_filter --n 1 --m msd --ns 10 --kn 10
 ```
 
 
-The following command executes 10-fold validation for collaborative filtering with euclidean distance similarity metric and
-a neighbourhood size of 10:
+The following command executes 10-fold validation for collaborative filtering with euclidean
+distance similarity metric and a neighbourhood size of 10:
 
 ```
 python manage.py collaborative_filter --n 1 --m euclidean --ns 10 --kn 10
 ```
 
 The following command executes 10-fold validation for collaborative filtering with similarity based
-in Pearson Correlation and
-a neighbourhood size of 10:
+in Pearson Correlation and a neighbourhood size of 10:
+
 ```
 python manage.py collaborative_filter --n 1 --m pearson --ns 10 --kn 10
 ```
 
-The following command executes 10-fold validation for collaborative filtering with msd similarity metric and
-a neighbourhood size of 100:
-
+The following command executes 10-fold validation for collaborative filtering with
+msd similarity metric and a neighbourhood size of 100:
 
 ```
 python manage.py collaborative_filter --n 1 --m msd --ns 100 --kn 10 
@@ -209,8 +208,8 @@ python manage.py collaborative_filter --n 1 --m msd --ns 100 --kn 10
 
 ### Benchmarking Resnik Collaborative Filtering
 
-```python3 manage.py resnik_collaborative_filter``` command benchmarks performance of collaborative filtering with
-reskink formula.
+```python3 manage.py resnik_collaborative_filter``` command benchmarks performance of
+collaborative filtering with reskink formula.
 
 The following parameters can be used to mofify predictor behaviour:
 
@@ -220,17 +219,126 @@ The following parameters can be used to mofify predictor behaviour:
 
 * --ns neighbourhood size
 
-* --t ratings threshold: default value is 2, it specifies the minimum number of ratings by
-movie required to include that movie in the computations.
-
-The following command executes 10-fold validation for resnik collaborative filtering with msd similarity metric and
-a neighbourhood size of 10:
+The following command executes 10-fold validation for resnik collaborative filtering with
+msd similarity metric and a neighbourhood size of 10:
 
 
 ```
 python manage.py resnik_collaborative_filter  --m msd --ns 10 --kn 10 
 ```
 
+
+### Benchmarking Frequent Item Recommender
+
+```python manage.py frequent_item_recommender``` command bechmarks performace of
+recommendations based on most frequent items.
+
+
+The following parameters can be used to mofify predictor behaviour:
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+The following command executes 10-fold validation for frequent items recommendation with
+a neighbourhood size of 10 and pearson correlation for knn:
+
+```
+python manage.py frequent_item_recommender --ns 10 --kn 10 --m pearson
+```
+
+
+### Benchmarking Linked Item Recommender
+
+```python manage.py linked_item_recommender``` command bechmarks performace of
+recommendations based on mean of the ratings across neighbours
+
+The following parameters can be used to mofify predictor behaviour:
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+
+The following command executes 10-fold validation for linked items recommendation with
+a neighbourhood size of 10 and pearson correlation for knn:
+
+
+```
+python manage.py linked_item_recommender --ns 10 --kn 10  --m pearson
+```
+
+
+### Benchmarking Mean Predictor Recommender
+
+```python manage.py mean_predictor_recommender``` command bechmarks performance of
+recommendations based on mean predictons.
+
+The following parameters can be used to modify predictor behaviour:
+
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+
+The following command executes 10-fold validation for mean prediction recommendation with
+a neighbourhood size of 10 and perason correlation:
+
+```
+python manage.py mean_predictor_recommender --ns 10 --kn 10 --m pearson
+```
+
+
+### Benchmarking Collaborative Predictor Recommender
+
+```python manage.py collaborative_predictor_recommender``` command bechmarks performance of
+recommendations based on collaborative filtering predictons.
+
+The following parameters can be used to modify predictor behaviour:
+
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+
+The following command executes 10-fold validation for collaborative filtering recommendation with
+a neighbourhood size of 10 and pearson correlation:
+
+```
+python manage.py collaborative_predictor_recommender --ns 10 --kn 10 --m pearson
+```
+
+### Benchmarking Resnik Predictor Recommender
+
+```python manage.py resnik_predictor_recommender``` command bechmarks performance of
+recommendations based on Resnik collaborative filtering predictions.
+
+The following parameters can be used to modify predictor behaviour:
+
+
+* --kn number of folds: by default will execute the benchmark in a leave-one-out style.
+
+* --m similarity metric: valid values are: cosine, euclidean, msd, pearson
+
+* --ns neighbourhood size
+
+
+The following command executes 10-fold validation for Resnik collaborative filtering
+recommendation with a neighbourhood size of 10 and pearson correlation:
+
+```
+python manage.py resnik_predictor_recommender --ns 10 --kn 10 --m pearson
+```
 
 
 ## Resources

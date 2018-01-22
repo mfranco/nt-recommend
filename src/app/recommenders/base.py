@@ -22,34 +22,14 @@ class BaseRecommender(object):
     The top-N items with the highest scores are returned as
     recommendations
     """
-
     def __init__(
-            self, db, predictor='mean', similarity_metric='msd',
-            neighbourhood_size=10, **kwargs):
-
-        predictor_ditc = {
-            'collaborative': CollaborativePredictor,
-            'resnik': ResnickPredictor,
-            'mean': MeanPredictor
-        }
-
-        if 'init_predictor_params' in kwargs:
-            init_predictor_params = kwargs['init_predictor_params']
-        else:
-            init_predictor_params = {}
+            self, db, similarity_metric='msd', neighbourhood_size=10):
 
         self.db = db
         self.build_neighbourhood(neighbourhood_size, similarity_metric)
-        init_predictor_params['db'] = self.db
-        # inject neighbourhood to predictor
-        if predictor in ('collaborative', 'resnik'):
-            init_predictor_params['knn'] = self.knn
-            init_predictor_params['similarity_metric'] = similarity_metric
-            init_predictor_params['neighbourhood_size'] = neighbourhood_size
-
-        self.predictor = predictor_ditc[predictor](**init_predictor_params)
 
         self.user_recommendations = {}
+
 
     def build_neighbourhood(self, neighbourhood_size, similarity_metric):
         """
@@ -103,6 +83,7 @@ class BaseRecommender(object):
 
 
 class FrequentItemRecommender(BaseRecommender):
+
     def rank_recommendations(self, recommendations, user_id):
         """
         Ranks a list of items based on the rating frequency by item
@@ -115,7 +96,9 @@ class FrequentItemRecommender(BaseRecommender):
             movie_dict.items(), key=operator.itemgetter(1), reverse=True)
 
 
+
 class LinkedItemRecommender(BaseRecommender):
+
     def rank_recommendations(self, recommendations, user_id):
         """
         Ranks a list of items based Mean of the ratings across neighbours
@@ -129,6 +112,37 @@ class LinkedItemRecommender(BaseRecommender):
 
 
 class PredictorRecommender(BaseRecommender):
+    def __init__(
+            self, db, predictor_name=None, similarity_metric='msd',
+            neighbourhood_size=10, **kwargs):
+
+
+        predictor_ditc = {
+            'collaborative': CollaborativePredictor,
+            'resnik': ResnickPredictor,
+            'mean': MeanPredictor
+        }
+
+        assert predictor_name in predictor_ditc
+
+        if 'init_predictor_params' in kwargs:
+            init_predictor_params = kwargs['init_predictor_params']
+        else:
+            init_predictor_params = {}
+
+        self.db = db
+        self.build_neighbourhood(neighbourhood_size, similarity_metric)
+        init_predictor_params['db'] = self.db
+
+        # inject neighbourhood to predictor, mean predictor doesn't use knn
+        if predictor_name in ('collaborative', 'resnik'):
+            init_predictor_params['knn'] = self.knn
+            init_predictor_params['similarity_metric'] = similarity_metric
+            init_predictor_params['neighbourhood_size'] = neighbourhood_size
+        self.predictor = predictor_ditc[predictor_name](**init_predictor_params)
+
+        self.user_recommendations = {}
+
     def rank_recommendations(self, recommendations, user_id):
         """
         Ranks a list of items based on a prediction for each of the candidate
